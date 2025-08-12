@@ -1,6 +1,5 @@
 # 💰 MoneyFlow - Personal Finance Tracker
 
-A modern, feature-rich personal finance management application built with vanilla JavaScript, covering all essential JavaScript concepts for junior developers.
 
 ## 🚀 Live Demo
 
