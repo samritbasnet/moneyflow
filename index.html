@@ -1,84 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MoneyFlow - Personal Finance Tracker</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <header class="header">
-    <div class="header-content">
-      <div class="logo-section">
-        <h1 class="logo">
-          <span class="logo-icon">💰</span>
-          MoneyFlow
-        </h1>
-        <p class="tagline">Track your money, achieve your goals</p>
-      </div>
-
-      <div class="header-actions">
-        <div class="total-balance">
-          <span class="balance-label">Total Balance</span>
-          <span class="balance-amount" id="totalBalance">$0.00</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyFlow - Personal Finance Tracker</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-content">
+        <div class="logo-section">
+          <h1 class="logo">
+            <span class="logo-icon">💰</span>
+            MoneyFlow
+          </h1>
+          <p class="tagline">Track your money, achieve your goals</p>
         </div>
 
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle Dark Mode">
-          <span class="theme-icon">🌙</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="main-content">
-    <!-- Quick Stats Section -->
-    <section class="quick-stats" aria-label="Financial overview">
-      <h2 class="section-title">Financial Overview</h2>
-      <div class="stats-grid">
-        <!-- Income Card -->
-        <div class="stat-card income">
-          <div class="stat-icon">📈</div>
-          <div class="stat-content">
-            <h3 class="stat-title">Total Income</h3>
-            <p class="stat-amount" id="totalIncome">$0.00</p>
-            <span class="stat-period">This month</span>
+        <div class="header-actions">
+          <div class="total-balance">
+            <span class="balance-label">Total Balance</span>
+            <span class="balance-amount" id="totalBalance">$0.00</span>
           </div>
-        </div>
 
-        <!-- Expenses Card -->
-        <div class="stat-card expenses">
-          <div class="stat-icon">📉</div>
-          <div class="stat-content">
-            <h3 class="stat-title">Total Expenses</h3>
-            <p class="stat-amount" id="totalExpenses">$0.00</p>
-            <span class="stat-period">This month</span>
-          </div>
-        </div>
-
-        <!-- Savings Card -->
-        <div class="stat-card savings">
-          <div class="stat-icon">💰</div>
-          <div class="stat-content">
-            <h3 class="stat-title">Net Savings</h3>
-            <p class="stat-amount" id="netSavings">$0.00</p>
-            <span class="stat-period">This month</span>
-          </div>
-        </div>
-
-        <!-- Budget Status Card -->
-        <div class="stat-card budget">
-          <div class="stat-icon">🎯</div>
-          <div class="stat-content">
-            <h3 class="stat-title">Budget Status</h3>
-            <p class="stat-amount" id="budgetStatus">On Track</p>
-            <span class="stat-period">Monthly goal</span>
-          </div>
+          <button
+            class="theme-toggle"
+            id="theme-toggle"
+            aria-label="Toggle Dark Mode"
+          >
+            <span class="theme-icon">🌙</span>
+          </button>
         </div>
       </div>
-    </section>
-  </main>
+    </header>
 
-  <!-- JavaScript -->
-  <script src="js/app.js" type="module"></script>
-</body>
+    <main class="main-content">
+      <!-- Quick Stats Section -->
+      <section class="quick-stats" aria-label="Financial overview">
+        <h2 class="section-title">Financial Overview</h2>
+        <div class="stats-grid">
+          <!-- Income Card -->
+          <div class="stat-card income">
+            <div class="stat-icon">📈</div>
+            <div class="stat-content">
+              <h3 class="stat-title">Total Income</h3>
+              <p class="stat-amount" id="totalIncome">$0.00</p>
+              <span class="stat-period">This month</span>
+            </div>
+          </div>
+
+          <!-- Expenses Card -->
+          <div class="stat-card expenses">
+            <div class="stat-icon">📉</div>
+            <div class="stat-content">
+              <h3 class="stat-title">Total Expenses</h3>
+              <p class="stat-amount" id="totalExpenses">$0.00</p>
+              <span class="stat-period">This month</span>
+            </div>
+          </div>
+
+          <!-- Savings Card -->
+          <div class="stat-card savings">
+            <div class="stat-icon">💰</div>
+            <div class="stat-content">
+              <h3 class="stat-title">Net Savings</h3>
+              <p class="stat-amount" id="netSavings">$0.00</p>
+              <span class="stat-period">This month</span>
+            </div>
+          </div>
+
+          <!-- Budget Status Card -->
+          <div class="stat-card budget">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-content">
+              <h3 class="stat-title">Budget Status</h3>
+              <p class="stat-amount" id="budgetStatus">On Track</p>
+              <span class="stat-period">Monthly goal</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add Transaction Section -->
+      <section class="add-transaction" aria-label="Add new transaction">
+        <div class="form-container">
+          <h2 class="section-title">Add New Transaction</h2>
+          <form class="transaction-form" id="transactionForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="transactionType" class="form-label">Type</label>
+                <select
+                  id="transactionType"
+                  name="type"
+                  class="form-select"
+                  required
+                >
+                  <option value="">Select type</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="transactionAmount" class="form-label">Amount</label>
+                <input
+                  type="number"
+                  id="transactionAmount"
+                  name="amount"
+                  class="form-input"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="transactionCategory" class="form-label"
+                  >Category</label
+                >
+                <select
+                  id="transactionCategory"
+                  name="category"
+                  class="form-select"
+                  required
+                >
+                  <option value="">Select category</option>
+                  <!-- Categories will be populated by JavaScript -->
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="transactionDate" class="form-label">Date</label>
+                <input
+                  type="date"
+                  id="transactionDate"
+                  name="date"
+                  class="form-input"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="transactionDescription" class="form-label"
+                >Description</label
+              >
+              <input
+                type="text"
+                id="transactionDescription"
+                name="description"
+                class="form-input"
+                placeholder="Enter transaction description"
+                required
+              />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">
+                <span class="btn-icon">➕</span>
+                Add Transaction
+              </button>
+              <button type="reset" class="btn btn-secondary">
+                <span class="btn-icon">🔄</span>
+                Clear Form
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Dashboard Charts Section -->
+      <section class="dashboard-charts" aria-label="Financial analytics">
+        <div class="charts-container">
+          <!-- Charts will be added here -->
+          <div class="chart-section">
+            <h2 class="section-title">Monthly Overview</h2>
+            <div class="chart-wrapper">
+              <canvas id="monthlyChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+          <div class="chart-section">
+            <h2 class="section-title">Category Breakdown</h2>
+            <div class="chart-wrapper">
+              <canvas id="categoryChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+          <div class="chart-section">
+            <h2 class="section-title">Expense Trends</h2>
+            <div class="chart-wrapper">
+              <canvas id="expenseChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+          <div class="chart-section">
+            <h2 class="section-title">Savings Progress</h2>
+            <div class="chart-wrapper">
+              <canvas id="savingsChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Transaction List Section -->
+      <section class="transaction-list" aria-label="Transaction history">
+        <h2 class="section-title">Transaction History</h2>
+        <div class="transaction-table-container">
+          <table class="transaction-table" id="transactionTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Description</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Transactions will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <!-- JavaScript -->
+    <script src="js/app.js" type="module"></script>
+  </body>
 </html>
