@@ -36,18 +36,29 @@ class MoneyFlowApp {
     console.log("🚀 MoneyFlow App starting...");
     this.setupEventListeners();
     this.loadFromStorage();
+    this.loadTheme(); // 🌙 Load saved theme
     this.updateStats();
     this.updateTransactionTable();
     this.initializeChart();
   }
 
   setupEventListeners() {
-    const form = document.getElementById("transactionForm");
+    console.log("🎧 Setting up event listeners...");
 
+    // Form submission listener
+    const form = document.getElementById("transactionForm");
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       this.handleFormSubmission();
     });
+
+    // 🌙 Theme toggle listener (NEW!)
+    const themeToggle = document.getElementById("theme-toggle");
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        this.toggleTheme();
+      });
+    }
   }
 
   handleFormSubmission() {
@@ -213,24 +224,24 @@ class MoneyFlowApp {
     return { labels, data };
   }
 
-  // 📊 STEP 1: Get data for expense chart (simple version)
+  // 📊 Get data for expense chart
   prepareExpenseChartData() {
     // Create empty arrays to store our chart data
     const categories = []; // Names like "Food", "Bills"
     const amounts = []; // Money amounts like 50, 100
     const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"];
 
-    // Step 1: Find all expense transactions
+    // Find all expense transactions
     const expenses = this.transactions.filter((t) => t.type === "expense");
 
-    // Step 2: Get unique categories
+    // Get unique categories
     expenses.forEach((transaction) => {
       if (!categories.includes(transaction.category)) {
         categories.push(transaction.category);
       }
     });
 
-    // Step 3: Calculate total for each category
+    // Calculate total for each category
     categories.forEach((category) => {
       let total = 0;
 
@@ -251,9 +262,9 @@ class MoneyFlowApp {
     };
   }
 
-  // 📊 STEP 2: Get income vs expense data (simple version)
+  // 📊 Get income vs expense data
   prepareIncomeVsExpenseData() {
-    // Calculate total income (simple way)
+    // Calculate total income
     let totalIncome = 0;
     this.transactions.forEach((transaction) => {
       if (transaction.type === "income") {
@@ -261,7 +272,7 @@ class MoneyFlowApp {
       }
     });
 
-    // Calculate total expenses (simple way)
+    // Calculate total expenses
     let totalExpenses = 0;
     this.transactions.forEach((transaction) => {
       if (transaction.type === "expense") {
@@ -276,21 +287,112 @@ class MoneyFlowApp {
     };
   }
 
+  prepareExpenseTrendData() {
+    const months = [];
+    const expenseData = [];
+
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    const today = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      months.push(monthNames[date.getMonth()]);
+    }
+
+    months.forEach((month, index) => {
+      const monthDate = new Date(
+        today.getFullYear(),
+        today.getMonth() - (5 - index),
+        1
+      );
+      let monthExpenses = 0;
+
+      this.transactions.forEach((transaction) => {
+        if (transaction.type === "expense") {
+          const transactionDate = new Date(transaction.date);
+          if (
+            transactionDate.getMonth() === monthDate.getMonth() &&
+            transactionDate.getFullYear() === monthDate.getFullYear()
+          ) {
+            monthExpenses += transaction.amount;
+          }
+        }
+      });
+
+      expenseData.push(monthExpenses);
+    });
+
+    return {
+      labels: months,
+      data: expenseData,
+      borderColor: "#ef4444",
+      backgroundColor: "rgba(239, 68, 68, 0.1)",
+    };
+  }
+
+  prepareSavingsProgressData() {
+    let totalIncome = 0;
+    let totalExpenses = 0;
+
+    this.transactions.forEach((transaction) => {
+      if (transaction.type === "income") {
+        totalIncome += transaction.amount;
+      } else if (transaction.type === "expense") {
+        totalExpenses += transaction.amount;
+      }
+    });
+
+    const savings = totalIncome - totalExpenses;
+    const savingsGoal = 5000;
+    const progress = Math.min((savings / savingsGoal) * 100, 100);
+
+    return {
+      labels: ["Saved", "Remaining"],
+      data: [savings, Math.max(savingsGoal - savings, 0)],
+      colors: ["#059669", "#e5e7eb"],
+      progress: progress,
+    };
+  }
+
+  getChartTextColor() {
+    const isDarkMode =
+      document.documentElement.getAttribute("data-theme") === "dark";
+    return isDarkMode ? "#ffffff" : "#374151";
+  }
+
+  getChartGridColor() {
+    const isDarkMode =
+      document.documentElement.getAttribute("data-theme") === "dark";
+    return isDarkMode ? "#374151" : "#e5e7eb"; //
+  }
+
   initializeChart() {
     this.initializeCategoryChart();
     this.initializeMonthlyChart();
+    this.initializeExpenseTrendChart();
+    this.initializeSavingsChart();
   }
 
-  // 🍩 STEP 3: Create the pie chart (simple version)
+  // 🍩 Create the pie chart
   initializeCategoryChart() {
-    // Step 1: Get the canvas element where chart will show
+    // Get the canvas element and prepare data
     const canvas = document.getElementById("categoryChart");
     const ctx = canvas.getContext("2d");
-
-    // Step 2: Get our prepared data
     const chartData = this.prepareExpenseChartData();
-
-    // Step 3: Create the chart with basic settings
+    const textColor = this.getChartTextColor();
     this.categoryChart = new Chart(ctx, {
       type: "doughnut", // This makes a donut/pie chart
       data: {
@@ -310,22 +412,23 @@ class MoneyFlowApp {
         plugins: {
           legend: {
             position: "bottom",
+            labels: {
+              color: textColor, // Theme-aware text color
+            },
           },
         },
       },
     });
   }
 
-  // 📊 STEP 4: Create the bar chart (simple version)
+  // 📊 Create the bar chart
   initializeMonthlyChart() {
-    // Step 1: Get the canvas element
+    // Get the canvas element and prepare data
     const canvas = document.getElementById("monthlyChart");
     const ctx = canvas.getContext("2d");
-
-    // Step 2: Get our prepared data
     const chartData = this.prepareIncomeVsExpenseData();
-
-    // Step 3: Create the bar chart with basic settings
+    const textColor = this.getChartTextColor();
+    const gridColor = this.getChartGridColor();
     this.monthlyChart = new Chart(ctx, {
       type: "bar", // This makes a bar chart
       data: {
@@ -342,8 +445,22 @@ class MoneyFlowApp {
       options: {
         responsive: true,
         scales: {
+          x: {
+            ticks: {
+              color: textColor, // Theme-aware axis text
+            },
+            grid: {
+              color: gridColor, // Theme-aware grid lines
+            },
+          },
           y: {
             beginAtZero: true, // Start chart at $0
+            ticks: {
+              color: textColor, // Theme-aware axis text
+            },
+            grid: {
+              color: gridColor, // Theme-aware grid lines
+            },
           },
         },
         plugins: {
@@ -355,7 +472,97 @@ class MoneyFlowApp {
     });
   }
 
-  // 🔄 STEP 5: Update charts when data changes (simple version)
+  // 📈 Create expense trend line chart
+  initializeExpenseTrendChart() {
+    // Get the canvas element and prepare data
+    const canvas = document.getElementById("expenseChart");
+    const ctx = canvas.getContext("2d");
+    const chartData = this.prepareExpenseTrendData();
+    const textColor = this.getChartTextColor();
+    const gridColor = this.getChartGridColor();
+    this.expenseChart = new Chart(ctx, {
+      type: "line", // This makes a line chart
+      data: {
+        labels: chartData.labels, // Month names
+        datasets: [
+          {
+            label: "Monthly Expenses ($)",
+            data: chartData.data, // Expense amounts per month
+            borderColor: chartData.borderColor, // Red line
+            backgroundColor: chartData.backgroundColor, // Light red fill
+            borderWidth: 3,
+            fill: true, // Fill area under line
+            tension: 0.4, // Smooth line curves
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            ticks: {
+              color: textColor, // Theme-aware axis text
+            },
+            grid: {
+              color: gridColor, // Theme-aware grid lines
+            },
+          },
+          y: {
+            beginAtZero: true, // Start chart at $0
+            ticks: {
+              color: textColor, // Theme-aware axis text
+            },
+            grid: {
+              color: gridColor, // Theme-aware grid lines
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: false, // Hide the legend
+          },
+        },
+      },
+    });
+  }
+
+  // 💰 Create savings progress chart
+  initializeSavingsChart() {
+    // Get the canvas element and prepare data
+    const canvas = document.getElementById("savingsChart");
+    const ctx = canvas.getContext("2d");
+    const chartData = this.prepareSavingsProgressData();
+    const textColor = this.getChartTextColor();
+    this.savingsChart = new Chart(ctx, {
+      type: "doughnut", // This makes a donut chart for progress
+      data: {
+        labels: chartData.labels, // ["Saved", "Remaining"]
+        datasets: [
+          {
+            label: "Savings Progress",
+            data: chartData.data, // [saved amount, remaining amount]
+            backgroundColor: chartData.colors, // Green for saved, gray for remaining
+            borderWidth: 2,
+            borderColor: "#ffffff",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        cutout: "70%", // Makes the donut hole bigger for progress look
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              color: textColor, // Theme-aware text color
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // 🔄 Update charts when data changes
   updateCharts() {
     // If no transactions, don't update charts
     if (this.transactions.length === 0) {
@@ -388,6 +595,109 @@ class MoneyFlowApp {
 
       // Tell the chart to redraw
       this.monthlyChart.update();
+    }
+
+    // Update the new charts too
+    if (this.expenseChart) {
+      const expenseData = this.prepareExpenseTrendData();
+      this.expenseChart.data.labels = expenseData.labels;
+      this.expenseChart.data.datasets[0].data = expenseData.data;
+      this.expenseChart.update();
+    }
+
+    if (this.savingsChart) {
+      const savingsData = this.prepareSavingsProgressData();
+      this.savingsChart.data.labels = savingsData.labels;
+      this.savingsChart.data.datasets[0].data = savingsData.data;
+      this.savingsChart.data.datasets[0].backgroundColor = savingsData.colors;
+      this.savingsChart.update();
+    }
+  }
+
+  // 🎨 UPDATE CHARTS THEME (when switching dark/light mode)
+  updateChartsTheme() {
+    const textColor = this.getChartTextColor();
+    const gridColor = this.getChartGridColor();
+
+    // Update category chart theme
+    if (this.categoryChart) {
+      this.categoryChart.options.plugins.legend.labels.color = textColor;
+      this.categoryChart.update();
+    }
+
+    // Update monthly chart theme
+    if (this.monthlyChart) {
+      this.monthlyChart.options.scales.x.ticks.color = textColor;
+      this.monthlyChart.options.scales.x.grid.color = gridColor;
+      this.monthlyChart.options.scales.y.ticks.color = textColor;
+      this.monthlyChart.options.scales.y.grid.color = gridColor;
+      this.monthlyChart.update();
+    }
+
+    // Update expense chart theme
+    if (this.expenseChart) {
+      this.expenseChart.options.scales.x.ticks.color = textColor;
+      this.expenseChart.options.scales.x.grid.color = gridColor;
+      this.expenseChart.options.scales.y.ticks.color = textColor;
+      this.expenseChart.options.scales.y.grid.color = gridColor;
+      this.expenseChart.update();
+    }
+
+    // Update savings chart theme
+    if (this.savingsChart) {
+      this.savingsChart.options.plugins.legend.labels.color = textColor;
+      this.savingsChart.update();
+    }
+  }
+
+  // 🌙 THEME METHODS
+
+  // Load theme from browser storage
+  loadTheme() {
+    // Get saved theme from localStorage (like a browser cookie)
+    const savedTheme = localStorage.getItem("moneyflow-theme");
+
+    // If no saved theme, use light mode as default
+    const theme = savedTheme || "light";
+
+    // Apply the theme
+    this.applyTheme(theme);
+
+    console.log(`🌙 Loaded theme: ${theme}`);
+  }
+
+  // Switch between light and dark mode
+  toggleTheme() {
+    // Get current theme from the HTML
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+
+    // Switch to opposite theme
+    const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+    // Apply the new theme
+    this.applyTheme(newTheme);
+
+    console.log(`🌙 Switched to ${newTheme} mode`);
+  }
+
+  // Apply theme to the webpage
+  applyTheme(theme) {
+    // Set the theme on the HTML element
+    document.documentElement.setAttribute("data-theme", theme);
+
+    // Save theme to localStorage so it remembers next time
+    localStorage.setItem("moneyflow-theme", theme);
+
+    this.updateThemeIcon(theme);
+
+    this.updateChartsTheme();
+  }
+
+  updateThemeIcon(theme) {
+    const themeIcon = document.querySelector(".theme-icon");
+
+    if (themeIcon) {
+      themeIcon.textContent = theme === "light" ? "🌙" : "☀️";
     }
   }
 }
