@@ -5,7 +5,7 @@ class Transaction {
     this.category = category;
     this.date = date;
     this.description = description;
-    this.id = Date.now() + Math.random();
+    this.id = Date.now();
   }
 
   formatAmount() {
