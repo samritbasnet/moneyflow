@@ -127,16 +127,71 @@ class MoneyFlowApp {
         </td>
         <td>${transaction.description}</td>
         <td>
-          <button class="btn btn-sm">🗑️</button>
+          <button class="btn btn-sm" onclick="app.deleteTransaction('${
+            transaction.id
+          }')">🗑️</button>
         </td>
       `;
 
       tableBody.appendChild(row);
     });
   }
-}
 
+  deleteTransaction(id) {
+    console.log("Trying to delete ID:", id, "Type:", typeof id);
+    console.log(
+      "Available IDs:",
+      this.transactions.map((t) => ({ id: t.id, type: typeof t.id }))
+    );
+
+    const numericId = parseFloat(id);
+
+    this.transactions = this.transactions.filter((t) => {
+      console.log(
+        "Comparing:",
+        t.id,
+        "!==",
+        numericId,
+        "Result:",
+        t.id !== numericId
+      );
+      return t.id !== numericId;
+    });
+
+    this.updateStats();
+    this.updateTransactionTable();
+
+    alert("Transaction deleted successfully!");
+  }
+  saveToStorage() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.transactions));
+    } catch (err) {
+      console.error("Failed to save transactions", err);
+    }
+  }
+  loadFromStorage() {
+    try {
+      const raw = localStorage.getItem("STORAGE_KEY");
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      this.transactions = parsed.map(
+        (t) =>
+          new Transaction(t.amount, t.type, t.category, t.date, t.description)
+      );
+      this.transactions.forEach((tx, idx) => {
+        const original = parsed[idx];
+        if (original && original.id != null) {
+          tx.id = original.id;
+        }
+      });
+    } catch (err) {
+      console.error("Failed to load transactions", err);
+    }
+  }
+}
+let app;
 document.addEventListener("DOMContentLoaded", () => {
   console.log("📄 HTML loaded, starting MoneyFlow App...");
-  new MoneyFlowApp();
+  app = new MoneyFlowApp();
 });
