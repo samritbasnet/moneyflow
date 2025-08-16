@@ -1,3 +1,4 @@
+const STORAGE_KEY = "moneyflow-transactions-v1";
 class Transaction {
   constructor(amount, type, category, date, description) {
     this.amount = parseFloat(amount);
@@ -34,6 +35,9 @@ class MoneyFlowApp {
   init() {
     console.log("🚀 MoneyFlow App starting...");
     this.setupEventListeners();
+    this.loadFromStorage();
+    this.updateStats();
+    this.updateTransactionTable();
   }
 
   setupEventListeners() {
@@ -78,7 +82,8 @@ class MoneyFlowApp {
     document.getElementById("transactionForm").reset();
     console.log("All transactions", this.transactions);
 
-    // Update the UI
+    
+    this.saveToStorage();
     this.updateStats();
     this.updateTransactionTable();
   }
@@ -157,7 +162,7 @@ class MoneyFlowApp {
       );
       return t.id !== numericId;
     });
-
+    this.saveToStorage();
     this.updateStats();
     this.updateTransactionTable();
 
@@ -172,7 +177,7 @@ class MoneyFlowApp {
   }
   loadFromStorage() {
     try {
-      const raw = localStorage.getItem("STORAGE_KEY");
+      const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw);
       this.transactions = parsed.map(
