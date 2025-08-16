@@ -4,7 +4,9 @@ A modern, responsive personal finance dashboard built with vanilla JavaScript, f
 
 ## 🚀 Live Demo
 
-**🌟 [View Live Demo](https://samritbasnet.github.io/moneyflow/)** _(Enable GitHub Pages to activate)_
+**🌟 [View Live Demo](https://moneyflow-liard.vercel.app/)** - *Deployed on Vercel*
+
+[![MoneyFlow Demo](https://img.shields.io/badge/Demo-Live%20on%20Vercel-00C7B7?style=for-the-badge&logo=vercel)](https://moneyflow-liard.vercel.app/)
 
 ## 📊 Development Status - ✅ COMPLETED!
 
@@ -133,6 +135,7 @@ moneyflow/
 This project demonstrates mastery of JavaScript fundamentals and modern web development:
 
 ### **Core JavaScript Concepts**
+
 - ✅ ES6+ Classes and Object-Oriented Programming
 - ✅ DOM Manipulation and Event Handling
 - ✅ Local Storage and Data Persistence
@@ -140,6 +143,7 @@ This project demonstrates mastery of JavaScript fundamentals and modern web deve
 - ✅ Async JavaScript and Error Handling
 
 ### **Advanced Features**
+
 - ✅ Chart.js Integration for Data Visualization
 - ✅ Theme System with CSS Custom Properties
 - ✅ Responsive Design with CSS Grid and Flexbox
@@ -149,8 +153,9 @@ This project demonstrates mastery of JavaScript fundamentals and modern web deve
 ## 📈 Development Journey
 
 **✅ COMPLETED - 8 Days of Intensive Development:**
+
 - **Day 1-2**: HTML structure and CSS foundation
-- **Day 3-4**: JavaScript classes and core functionality  
+- **Day 3-4**: JavaScript classes and core functionality
 - **Day 5-6**: Chart integration and data visualization
 - **Day 7-8**: Theme system, responsive design, and polish
 
@@ -170,9 +175,16 @@ This project is **portfolio-ready** and demonstrates:
 - **Learning Reference**: Well-documented code for future projects
 - **Base for Extension**: Add backend, authentication, or advanced features
 
-## 📸 Screenshots
+## 📸 Live Application
 
-*Enable GitHub Pages deployment to see the live application in action!*
+**🎮 [Try it yourself at moneyflow-liard.vercel.app](https://moneyflow-liard.vercel.app/)**
+
+**Features to explore:**
+- ➕ Add sample income and expense transactions
+- 📊 Watch charts update in real-time
+- 🌙 Toggle between dark and light themes
+- 📱 Test responsive design on different screen sizes
+- 💾 Data persists between browser sessions
 
 ## 🤝 Contributing
 
