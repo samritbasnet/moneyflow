@@ -1,11 +1,11 @@
 class Transaction {
   constructor(amount, type, category, date, description) {
-    this.amount = amount;
+    this.amount = parseFloat(amount);
     this.type = type;
     this.category = category;
-    this.date = date;
+    this.date = new Date(date);
     this.description = description;
-    this.id = Date.now();
+    this.id = Date.now() + Math.random();
   }
 
   formatAmount() {
@@ -23,8 +23,8 @@ class Transaction {
   getCategory() {
     return this.category;
   }
-  getDate() {}
 }
+
 class MoneyFlowApp {
   constructor() {
     this.transactions = [];
@@ -46,6 +46,7 @@ class MoneyFlowApp {
       this.handleFormSubmission();
     });
   }
+
   handleFormSubmission() {
     console.log("Form submitted");
     const typeSelect = document.getElementById("transactionType");
@@ -76,6 +77,62 @@ class MoneyFlowApp {
     alert("Transaction added successfully");
     document.getElementById("transactionForm").reset();
     console.log("All transactions", this.transactions);
+
+    // Update the UI
+    this.updateStats();
+    this.updateTransactionTable();
+  }
+
+  updateStats() {
+    const totalIncome = this.transactions
+      .filter((t) => t.isIncome())
+      .reduce((sum, t) => sum + t.amount, 0);
+    const totalExpenses = this.transactions
+      .filter((t) => t.isExpense())
+      .reduce((sum, t) => sum + t.amount, 0);
+    const netSavings = totalIncome - totalExpenses;
+
+    document.getElementById(
+      "totalBalance"
+    ).textContent = `$${netSavings.toFixed(2)}`;
+    document.getElementById(
+      "totalIncome"
+    ).textContent = `$${totalIncome.toFixed(2)}`;
+    document.getElementById(
+      "totalExpenses"
+    ).textContent = `$${totalExpenses.toFixed(2)}`;
+    document.getElementById("netSavings").textContent = `$${netSavings.toFixed(
+      2
+    )}`;
+  }
+
+  updateTransactionTable() {
+    const tableBody = document.querySelector("#transactionTable tbody");
+
+    tableBody.innerHTML = "";
+
+    this.transactions.forEach((transaction) => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${transaction.formatDate()}</td>
+        <td>
+          <span class="transaction-type ${transaction.type}">
+            ${transaction.type === "income" ? "📈" : "📉"} ${transaction.type}
+          </span>
+        </td>
+        <td>${transaction.category}</td>
+        <td class="${transaction.isIncome() ? "text-success" : "text-danger"}">
+          ${transaction.isIncome() ? "+" : "-"}${transaction.formatAmount()}
+        </td>
+        <td>${transaction.description}</td>
+        <td>
+          <button class="btn btn-sm">🗑️</button>
+        </td>
+      `;
+
+      tableBody.appendChild(row);
+    });
   }
 }
 
